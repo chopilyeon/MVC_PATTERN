@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.BoardDAO">
+
+
+	<resultMap type="boardVO" id="boardMap">
+	<!--컬럼명과 vo의 이름이 달랐을 때 mapping 시키는 역할임 dbms랑 java의 이름이 달라져버림 property 에서는 그냥 속성임 setter같은 역할임    -->
+		<result column ="no" property="no"/>
+		<result column ="title" property="title"/>
+		<result column ="writer" property="writer"/>
+		<result column ="content" property="content"/>
+		<result column ="view_cnt" property="viewCnt"/>
+		<result column ="reg_date" property="regDate"/>
+	</resultMap>
+	
+	
+	<!--공통의 쿼리를 묶어주고 싶은 것임   -->
+	<sql id="selectAll">
+		select no, title, writer, content, view_cnt as viewCnt
+		, to_char(reg_date,'yyyy-mm-dd') regDate 
+		from t_board
+	</sql>
+
+
+
+
+
+
+<!-- 	<insert id = "insertBoard" parameterType="kr.ac.kopo.vo.BoardVO"> alias 줄 수 있음 mybatis-config 에서 alias정의 해줌.  -->
+		<insert id = "insertBoard" parameterType="boardVO">	
+		insert into t_board(no,title,writer,content)
+		<!-- values(seq_t_board_no.nextval,'aaa','bbb','ccc') -->
+		<!-- values(seq_t_board_no.nextval,'${title}','${writer}',$'{content}') -->
+		<!-- values(seq_t_board_no.nextval,mybatis삽입,${writer},${content}) -->
+		values(seq_t_board_no.nextval,#{title},#{writer},#{content})
+		<!--보안때문에 # 씀   -->
+		<!--${} 는 기본적으로 statement 객체의 변수를 변환 시켜주는 것임.  문자열인 경우에는 ' ' 붙여줘야 하므로!  -->
+	</insert>	
+	
+	<!--하나의 레코드가 갖고 있는 여러개의 컬럼들을 어떤식으로 mapping할것인지에 대한 문제임. 알아서 setter로 만들어서 넣어줌.  -->
+	<select id="selectAllBoard" resultType="boardVO">
+		select no,title,writer,content, view_cnt as viewCnt , reg_date as regDate 
+		 from t_board
+		 order by no desc
+	</select>
+	
+	<!--selectAll이랑 똑같음  -->
+	<select id="selectAllBoard2" resultType="boardVO">
+		<include refid="selectAll"/>
+		order by no desc
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="selectByNo" resultType="boardVO" parameterType="int">
+		select no,title,writer,content,view_cnt as viewCnt
+		,to_char(reg_date,'yyyy-mm-dd') regDate 
+		from t_board
+		where no = #{anything}
+		<!--$ 나 # 으로 받아야 함. 일반적으로 우리는 #을 더 많이 씀. 지금 int로 날라오는거 1개만 날라옴 그러므로 아무거나 써도 됨    -->
+	</select>
+	
+	
+	<select id="selectByNo2" resultType="boardVO" parameterType="boardVO">
+		select no, title, writer, content, view_cnt as viewCnt
+		, to_char(reg_date,'yyyy-mm-dd') regDate 
+		from t_board
+		where no = #{no}
+		<!--boardVO로 날라오므로 # 으로 getter로 받아버리자~!    -->
+	</select>
+	
+	
+	<!-- mapping 시키고자 resultMap 이라는 걸 이용함.  -->
+	<select id ="selectByNo3" parameterType="boardVO" resultMap="boardMap">
+		select * from t_board
+		where no = #{no}
+	</select>
+	
+	
+	
+	<!-- <select id ="selectWhere" resultType="boardVO" parameterType="java.lang.String"> string은 소문자로 그냥 써주어도 됨-->
+	<select id ="selectWhere" resultType="boardVO" parameterType="string">
+		<include refid = "selectAll" />
+		<!-- where title like '%${title}%'-->
+		<!--$는 알아서 변환될 수 있으므로 이렇게 쓸 수 있다~!   -->
+		<!--#은 어떻게 사용하지?  -->
+		where title like '%' || #{title} || '%'
+	</select>
+	
+	
+	<!--이러면 if 를 굉잫이 많이 써줘야 함   -->
+	<!-- 
+	
+	<select id ="selectWhere2" resultType="boardVO" parameterType="boardVO">
+		<include refid = "selectAll" />
+		where title = #{title}
+		and writer = #{writer}
+	</select>
+	
+	<select id ="selectWhere2-1" resultType="boardVO" parameterType="boardVO">
+		<include refid = "selectAll" />
+		where title = #{title}
+	</select>
+	
+	
+	
+	<select id ="selectWhere2-2" resultType="boardVO" parameterType="boardVO">
+		<include refid = "selectAll" />
+		where writer = #{writer}
+	</select> -->
+	
+	<!-- 그래서 이런 방법 사용  -->
+	
+	
+	<!-- 너무나도 귀찮고 힘든 과정임 -->
+	
+<!-- 	<select id ="selectWhere2" resultType="boardVO" parameterType="boardVO">
+		<include refid = "selectAll" />
+		where 
+			<if test = "title !=null">
+			title=#{title}
+			</if>
+			<if test = "title !=null and writer !=null"></if>
+			 	and
+			</if>
+			<if>
+			</if test = "writer !=null">
+	</select> -->
+	
+	<!--위에건 너무 힘듦  이렇게 할 것임  -->
+	<select id ="selectWhere2" resultType="boardVO" parameterType="boardVO">
+		<include refid = "selectAll" />
+		<where>
+			<if test="title !=null">
+			title=#{title}
+			</if>
+			<if test="writer !=null">
+			and writer = #{writer}
+			</if>
+		</where>
+		<!--컴퓨터가 where title = #{title} and writer = #{writer}
+				   where title=#{title}
+				   where writer = #{writer} 이런식으로 동적으로 바뀌게 됨 동적 tag! 	 
+				   전부 다 null 이면은 알아서 where 집어 넣을지 말지도 결정하게 됨.
+		 -->
+		
+	<!-- list 였다면 java.util.list 이렇게 받았을 것임.  -->	
+		
+	</select>
+	<select id ="selectNos" parameterType="boardVO" resultType="boardVO">
+		<include refid="selectAll" />
+		where no in 
+		<!-- ( -->
+		<!--하나씩 뽑은 데이터들을 item이라고 함 데이터와 데이터사이에 ,가 없네! , 붙여주자~! 그래도 에러 생김 -> 맨 뒤에도 , 붙으므로 에러 그래서 separator를 사용!!   -->
+		<!--괄호 열고 닫는 것도 귀찮음.  -->	
+			
+			<foreach collection="nos" item="bno" separator="," open="(" close=")">
+				#{bno}
+			</foreach>
+		<!-- )-->
+	</select>
+	
+		<!-- list 였다면 java.util.list 이렇게 받았을 것임.  -->	
+		
+	
+	<select id ="selectNos2" parameterType="int[]" resultType="boardVO">
+		<include refid="selectAll" />
+		where no in
+		<!--배열이 날라오므로 nos가 아니라 array라고 받아야 함. 파라미터 타입은 int 배열임 foreach collection에서는 반드시 array를 써야함 이건 약속임.  vo에서는 nos를 써도 되지만   -->
+			<foreach collection="array" item="bno" separator="," open="(" close=")">
+				#{bno}
+			</foreach>
+	</select>
+	
+	
+	<!--hashmap이랑 map둘다 가능함   -->
+	<select id = "selectMap" resultType="boardVO" parameterType="hashmap">
+		<include refid="selectAll" />
+		where title = #{title} and writer = #{writer}
+		<!--#에 들어가는애가 key가 들어가면 됨.   -->
+	</select>
+	
+	
+	<select id = "selectMap2" resultType="map" parameterType="int">
+		<include refid="selectAll" />
+		where no=#{no}
+	</select>
+	
+	
+	
+	
+	
+</mapper>
