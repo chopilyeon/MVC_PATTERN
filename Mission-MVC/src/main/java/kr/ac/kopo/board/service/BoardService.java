@@ -22,6 +22,14 @@ public class BoardService {
 		List<BoardVO> boardList = boardDao.selectAll();
 		return boardList;
 		
+	}
+	
+	
+	public void addBoard(BoardVO board) {
+		
+		int no = boardDao.selectBoardNo();
+		board.setNo(no);
+		boardDao.insertBoard(board);
 		
 		
 	}
