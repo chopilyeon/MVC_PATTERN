@@ -6,13 +6,26 @@
   	<servlet>
   		<servlet-name>frontController</servlet-name>
   		<servlet-class>kr.ac.kopo.controller.FrontControllerServlet</servlet-class>
+  	<!--handler 걔가 파일 경로를 읽어야함. 이걸 수행하기 위해서 환경설정을 해주도록 함.  -->
+  	<init-param>
+  		<param-name>propLocation</param-name>
+  		<param-value>D:\\Lecture\\web-workspace\\Mission-MVC\\bean.properties</param-value>
+  	</init-param>
   	</servlet>
+  	
   	
   	
   	<servlet-mapping>
   		<servlet-name>frontController</servlet-name>
   		<url-pattern>*.do</url-pattern>
   	</servlet-mapping>
+  	
+  	
+  	
+  	
+  	
+  	
+  	
   
   <!--뭐가들어오던간에 .do로 들어오면 frontController가 이를 처리하겠다.   -->
   

@@ -3,12 +3,27 @@ package kr.ac.kopo.controller;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class FrontControllerServlet extends HttpServlet {
+	private HandlerMapping mappings;
+	
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init();
+		
+		String propLocation = config.getInitParameter("propLocation");
+		System.out.println(propLocation);
+		
+		mappings = new HandlerMapping(propLocation);
+		//이렇게 함으로써 xml 이랑 bin.properties만 변경하면 됨.
+		//Handler map은 어디까지나 블랙박스 -> 우리는 xml 과 bin.properties로 제어하도록 함. 
+	}
 
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -32,7 +47,7 @@ public class FrontControllerServlet extends HttpServlet {
 			 * String callPage = null; 
 			 * Controller control = null;
 			 */
-			HandlerMapping mappings = new HandlerMapping();
+			//HandlerMapping mappings = new HandlerMapping();
 
 			Controller control = mappings.getController(uri);
 			/*
@@ -83,11 +98,16 @@ public class FrontControllerServlet extends HttpServlet {
 		}
 	}
 
+
 	/*
 	 * 
-	 * switch(uri) { case "/Mission-MVC/board/list.do" :
-	 * System.out.println("전체 게시글 조회서비스..."); break; case
-	 * "/Mission-MVC/board/writeForm.do": System.out.println("새글 등록 서비스..."); break;
+	 * switch(uri) {
+	 *  case "/Mission-MVC/board/list.do" :
+	 * System.out.println("전체 게시글 조회서비스..."); 
+	 * break;
+	 *  case "/Mission-MVC/board/writeForm.do":
+	 * System.out.println("새글 등록 서비스...");
+	 * break;
 	 * }
 	 * 
 	 * // "/Mission-MVC 이게 마음이 안들음. /Mission-Web 이면 어쩔거야. 실제 list.do만 있으면 좋겠음.

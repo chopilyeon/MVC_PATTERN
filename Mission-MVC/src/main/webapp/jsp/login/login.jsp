@@ -149,7 +149,7 @@ $( document ).ready(function() {
                     <hr class="hr-light my-4 wow fadeInDown" data-wow-delay="0.4s">
                     
                
-    <form action="loginProcess.jsp" method="post" onsubmit="return checkForm()" name="loginForm" >
+    <form action="${pageContext.request.contextPath }/loginProcess.do" method="post" onsubmit="return checkForm()" name="loginForm" >
 
     	<h1 class="h3 mb-3 fw-normal text-uppercase mb-4 white-text wow fadeInDown" data-wow-delay="0.4s">Please sign in</h1>
 

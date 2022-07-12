@@ -122,7 +122,7 @@
 				<th width ="25%">작성자</th>
 				<%-- <td>${userVO.id }</td>  --%>
 		
-				<td><input type="text" name="wrtier" ></td>
+				<td><input type="text" name="writer" ></td>
 				
 			</tr>
 			<tr>

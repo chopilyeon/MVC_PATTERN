@@ -98,8 +98,8 @@
 				<c:forEach items="${ list }" var="board" varStatus="loop">
 					<tr <c:if test="${loop.count mod 2 eq 0}">class="even table-light"</c:if>>
 						<td class="table-light">${ board.no }</td>
-						<td class="table-light"><a href="javascript:checkLogin(${board.no })"> <c:out
-									value="${board.title }" />
+						<td class="table-light"><a href="javascript:checkLogin(${board.no})"> <c:out
+									value="${board.title}" />
 						</a> <%-- <a href="detail.jsp?no=${ board.no }">
 						 ${board.title }
 						 <c:out value="${ board.title }"/> 
